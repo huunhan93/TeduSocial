@@ -19,5 +19,7 @@
 
 # Mongodb
 
+- https://mongoosejs.com
+- https://github.com/Automattic/mongoose : connect db
 - yarn add mongoose
 - yarn add @type/mongoose --dev

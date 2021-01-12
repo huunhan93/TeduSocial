@@ -1,7 +1,8 @@
 import { Route } from "core/interfaces";
 import express from "express";
+import mongoose from 'mongoose';
 
-export default class App{
+class App{
     public app: express.Application;
     public port: string | number;
 
@@ -10,6 +11,7 @@ export default class App{
         this.port = process.env.PORT || 5000
 
         this.initializeRoutes(routes)
+        this.connectToDatabase();
     }
     public listen(){
         this.app.listen(this.port, ()=>{
@@ -23,5 +25,21 @@ export default class App{
         })
     }
 
+    private connectToDatabase(){
+        const connectionString = 'mongodb+srv://nhanho:Abcd@4321@master.pe7jy.mongodb.net/tedusocial?retryWrites=true&w=majority';
+        try{
+            mongoose.connect(connectionString, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+                useFindAndModify: false,
+                useCreateIndex: true    
+            });
+            console.log('Database connected...')
+        } catch(error){
+            console.log('Connect to database error')
+        }
+    }
     
 }
+
+export default App;
