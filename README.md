@@ -16,6 +16,8 @@
 # Typescript
 
 - tsc --init
+- yarn add dotenv
+- cross-env: yarn add cross-env --dev
 
 # Mongodb
 
