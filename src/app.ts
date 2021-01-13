@@ -1,11 +1,13 @@
-import { Route } from "./core/interfaces";
-import { Logger } from "./core/utils";
+import { Route } from "@core/interfaces";
+import { Logger } from "@core/utils";
+
 import express from "express";
 import mongoose from 'mongoose';
 import hpp from 'hpp';
 import morgan from 'morgan';
 import cors from 'cors';
 import helmet from 'helmet';
+import { errorMiddleware } from "@core/middleware";
 
 
 class App{
@@ -44,6 +46,7 @@ class App{
             this.app.use(morgan('dev'));
             this.app.use(cors({origin: true, credentials: true}));
         }
+        this.app.use(errorMiddleware)
     }
 
     private connectToDatabase(){

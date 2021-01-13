@@ -34,3 +34,4 @@
 # valid biến môi trường
 
 - yarn add envalid
+- yarn add tsconfig-paths
