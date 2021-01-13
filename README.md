@@ -25,3 +25,8 @@
 - https://github.com/Automattic/mongoose : connect db
 - yarn add mongoose
 - yarn add @type/mongoose --dev
+
+# middleware Bảo mật cho dự án
+
+- yarn add hpp helmet morgan cors
+- yarn add winston -- format code cho dep
