@@ -30,3 +30,7 @@
 
 - yarn add hpp helmet morgan cors
 - yarn add winston -- format code cho dep
+
+# valid biến môi trường
+
+- yarn add envalid
