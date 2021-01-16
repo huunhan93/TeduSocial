@@ -35,3 +35,7 @@
 
 - yarn add envalid
 - yarn add tsconfig-paths
+
+# Log
+
+- https://www.npmjs.com/package/winston -- ghi log
