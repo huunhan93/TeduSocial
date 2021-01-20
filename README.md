@@ -39,3 +39,11 @@
 # Log
 
 - https://www.npmjs.com/package/winston -- ghi log
+
+# Lession 21
+
+- yarn add gravatar -- thu vien lay anh avatar
+- yarn add bcryptjs -- ma hoa va giai ma trong nodejs
+- yarn add jsonwebtoken
+
+# Json
