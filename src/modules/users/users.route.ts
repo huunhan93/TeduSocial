@@ -1,5 +1,5 @@
 import { Route } from "@core/interfaces";
-import { validationMiddleware } from "@core/middleware";
+import { authMiddleware, validationMiddleware } from "@core/middleware";
 import { Router } from "express";
 import RegisterDto from "./dtos/register.dto";
 import UsersController from "./users.controller";
@@ -14,14 +14,31 @@ export default class UsersRoute implements Route {
   }
 
   private initializeRoutes() {
-    this.router.post(this.path, this.usersController.register);
-    // POST: http://localhost:5000/api/users
+    this.router.post(
+      this.path,
+      validationMiddleware(RegisterDto, true),
+      this.usersController.register
+    );
+
     this.router.put(
       this.path + "/:id",
       validationMiddleware(RegisterDto, true),
       this.usersController.updateUser
-    ); // PUT: http://localhost:5000/api/users/:id
+    );
+
     this.router.get(this.path + "/:id", this.usersController.getUserById);
-    // GET: http://localhost:5000/api/users/:id
+
+    this.router.get(this.path, this.usersController.getAll);
+
+    this.router.get(
+      this.path + "/paging/:page",
+      this.usersController.getAllPaging
+    );
+
+    this.router.delete(
+      this.path + "/:id",
+      authMiddleware,
+      this.usersController.deleteUser
+    )
   }
 }
