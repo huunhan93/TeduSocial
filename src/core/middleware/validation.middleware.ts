@@ -18,6 +18,9 @@ const validationMiddleware = (
                   .join(', ');
                 next(new HttpException(400, messages));
               }
+              else{
+                next();
+              }
             }
         )
     }
