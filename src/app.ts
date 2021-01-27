@@ -62,7 +62,7 @@ class App {
       Logger.error("Connection string is invalid");
       return;
     }
-    Logger.info(connectionString);
+    //Logger.info(connectionString);
     mongoose
       .connect(connectionString, {
         useNewUrlParser: true,
