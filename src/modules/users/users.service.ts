@@ -1,5 +1,4 @@
-import { TokenData } from "@modules/auth";
-import { DataStoredInToken } from "./../auth/auth.interface";
+import { DataStoredInToken, TokenData } from "@modules/auth";
 import UserSchema from "./users.model";
 import RegisterDto from "./dtos/register.dto";
 import { isEmptyObject } from "@core/utils";
@@ -8,6 +7,8 @@ import gravatar from "gravatar";
 import bcryptjs from "bcryptjs";
 import IUser from "./users.interface";
 import jwt from "jsonwebtoken";
+import { IPagination } from "@core/interfaces";
+
 
 class UserService {
   public userSchema = UserSchema;
@@ -77,7 +78,7 @@ class UserService {
           ...model,
           avatar: avatar,
           password: hashedPassword,
-        })
+        }, {new: true})
         .exec();
     } else {
       updateUserById = await this.userSchema
@@ -99,6 +100,47 @@ class UserService {
       throw new HttpException(409, `User is not exists`);
     }
     return user;
+  }
+
+  public async getAll() : Promise<IUser[]>{
+    const users = await this.userSchema.find().exec();
+    return users;
+  }
+
+  public async getAllPaging(keyword: string, page: number): Promise<IPagination<IUser>> {
+    const pageSize: number = Number(process.env.PAGE_SIZE || 10);
+    let query ;
+    if(keyword){
+      query = this.userSchema
+        .find({
+          $or : [
+            {email: keyword}, 
+            {first_name: keyword}, 
+            {last_name: keyword}
+          ]
+        })
+        .sort({date: -1});
+    }else{
+      query = this.userSchema.find().sort({date: -1});
+    }
+    const users = await query
+      .skip((page -1) * pageSize)
+      .limit(pageSize)
+      .exec();
+
+    const rowCount = await query.countDocuments().exec();
+    return {
+      total : rowCount,
+      page : page,
+      pageSize : pageSize,
+      items: users
+    } as IPagination<IUser>;
+  }
+
+  public async deleteUser(userId: string) : Promise<IUser>{
+    const deleteUser = await this.userSchema.findByIdAndDelete(userId).exec();
+    if(!deleteUser) throw new HttpException(409, "Your id is invalid")
+    return deleteUser;
   }
 }
 

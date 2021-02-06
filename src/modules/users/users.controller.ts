@@ -41,4 +41,49 @@ export default class UsersController {
       next(error);
     }
   };
+
+  public getAll = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const users = await this.userService.getAll();
+      res.status(201).json(users);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public getAllPaging = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const page: number = Number(req.params.page);
+      const keyword = req.query.keyword || '';
+
+      const paginationResult = await this.userService.getAllPaging(
+        keyword.toString(),
+        page
+      );
+      res.status(201).json(paginationResult);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public deleteUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const user = await this.userService.deleteUser(req.params.id);
+      res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
