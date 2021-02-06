@@ -78,7 +78,7 @@ class UserService {
           ...model,
           avatar: avatar,
           password: hashedPassword,
-        })
+        }, {new: true})
         .exec();
     } else {
       updateUserById = await this.userSchema
