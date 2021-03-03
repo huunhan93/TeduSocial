@@ -102,6 +102,15 @@ const ProfileSchema = new mongoose.Schema({
             type: String,
         },
     },
+    followings: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'user'
+            }
+        }
+    ],
+    follower: [],
     date:  {
         type: Date,
         default: Date.now

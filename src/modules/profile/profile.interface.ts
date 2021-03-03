@@ -10,6 +10,7 @@ export interface IProfile {
     experience: IExperience[];
     education: IEducation[];
     social: ISocial;
+    followings : IFollower[];
     date: Date;
 }
 
@@ -41,4 +42,8 @@ export interface ISocial extends Record<string,string>{
     linkedIn: string;
     facebook: string;
     instagram: string;
+}
+
+export interface IFollower {
+    user: string
 }
