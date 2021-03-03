@@ -1,10 +1,11 @@
 import { HttpException } from "@core/exceptions";
 import { IUser, UserSchema } from "@modules/users";
 import CreateProfileDto from "./dtos/create_profile.dto";
-import { IProfile, ISocial } from "./profile.interface";
+import { IExperience, IProfile, ISocial } from "./profile.interface";
 import ProfileSchema from "./profile.model";
 import normalize from "normalize-url";
 import { profile } from "winston";
+import AddExperienceDto from "./dtos/add_experience.dto";
 
 class ProfileService {
   public async getCurrentProfile(userId: string): Promise<Partial<IUser>> {
@@ -88,6 +89,37 @@ class ProfileService {
         .populate('user', ['name','avatar'])
         .exec();
     return profiles;
+  }
+
+  public addExperience = async (userId: string, experience: AddExperienceDto) => {
+    const newExp = {
+      ...experience
+    }
+
+    const profile = await ProfileSchema.findOne({user: userId}).exec();
+    if(!profile){
+      throw new HttpException(400, 'There is not profile for this user')
+    }
+
+    profile.experience.unshift(newExp as IExperience);
+    await profile.save()
+
+    return profile
+  }
+
+  public deleteExperience = async(userId: string, experienceId: string) => {
+    const profile = await ProfileSchema.findOne({user: userId}).exec();
+
+    if(!profile){
+      throw new HttpException(400, "There is not profile for this user");
+    }
+
+    profile.experience = profile.experience.filter(
+      (exp) => exp._id.toString() !== experienceId
+    )
+
+    await profile.save()
+    return profile;
   }
 }
 
