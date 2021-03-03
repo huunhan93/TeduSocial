@@ -1,6 +1,7 @@
 import { Route } from "@core/interfaces";
 import { authMiddleware, validationMiddleware } from "@core/middleware";
 import { Router } from "express";
+import CreateCommentDto from "./dtos/create_comment.dto";
 import CreatePostDto from "./dtos/create_post.dto";
 import PostsController from "./posts.controller";
 
@@ -49,6 +50,18 @@ export default class PostsRoute implements Route {
       this.path + "/unlike/:id",
       authMiddleware,
       this.postsController.unlikePost
+    );
+
+    this.router.post(
+      this.path + "/comments/:id",
+      authMiddleware,
+      validationMiddleware(CreateCommentDto, true),
+      this.postsController.addComment
+    );
+    this.router.delete(
+      this.path + "/comments/:id/:comment_id",
+      authMiddleware,
+      this.postsController.removeComment
     );
   }
 }
