@@ -22,6 +22,7 @@ export default class UsersRoute implements Route {
 
     this.router.put(
       this.path + "/:id",
+      authMiddleware,
       validationMiddleware(RegisterDto, true),
       this.usersController.updateUser
     );
