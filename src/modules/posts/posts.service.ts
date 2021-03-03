@@ -4,7 +4,7 @@ import { UserSchema } from "@modules/users";
 import { PostSchema } from ".";
 import CreateCommentDto from "./dtos/create_comment.dto";
 import CreatePostDto from "./dtos/create_post.dto";
-import { IComment, ILike, IPost } from "./posts.interface";
+import { IComment, ILike, IPost, IShare } from "./posts.interface";
 
 export default class PostService {
   public async createPost(
@@ -148,14 +148,52 @@ export default class PostService {
     const post = await PostSchema.findById(postId).exec();
     if (!post) throw new HttpException(400, "Post not found");
 
-    const comment = await post.comments.find((c) => c._id.toString() === commentId);
+    const comment = await post.comments.find(
+      (c) => c._id.toString() === commentId
+    );
     if (!comment) throw new HttpException(400, "Comment not found");
 
-    if(comment.user.toString() !== userId)
+    if (comment.user.toString() !== userId)
       throw new HttpException(401, "User is not auth");
 
-    post.comments = post.comments.filter(({ _id}) => _id !== commentId);
+    post.comments = post.comments.filter(({ _id }) => _id !== commentId);
     await post.save();
     return post.comments;
+  }
+
+  public async sharePost(userId: string, postId: string): Promise<IShare[]> {
+    const post = await PostSchema.findById(postId).exec();
+    if (!post) throw new HttpException(400, "Post not found");
+
+    if (
+      post.shares &&
+      post.shares.some((share: IShare) => share.user.toString() === userId)
+    ) {
+      throw new HttpException(400, "Post already shared");
+    }
+
+    if (!post.shares) post.shares = [];
+    post.shares.unshift({ user: userId });
+
+    await post.save();
+    return post.shares;
+  }
+
+  public async unsharePost(userId: string, postId: string): Promise<IShare[]> {
+    const post = await PostSchema.findById(postId).exec();
+    if (!post) throw new HttpException(400, "Post not found");
+
+    if (
+      post.shares &&
+      !post.shares.some((share: IShare) => share.user.toString() === userId)
+    ) {
+      throw new HttpException(400, "Post has not yet been shared");
+    }
+
+    if (!post.shares) post.shares = [];
+    post.shares = post.shares.filter(({ user }) => user.toString() !== userId);
+
+    await post.save();
+    return post.shares;
   }
 }

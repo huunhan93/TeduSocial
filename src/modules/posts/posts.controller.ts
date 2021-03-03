@@ -168,4 +168,34 @@ export default class PostsController {
       next(error)
     }
   };
+
+  public sharePost = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try{
+      const postId = req.params.id;
+      const share = await this.postService.sharePost(req.user.id, postId);
+      res.status(200).json(share);
+    }
+    catch(error){
+      next(error)
+    }
+  };
+
+  public unsharePost = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try{
+      const postId = req.params.id;
+      const share = await this.postService.unsharePost(req.user.id, postId);
+      res.status(200).json(share);
+    }
+    catch(error){
+      next(error)
+    }
+  };
 }
