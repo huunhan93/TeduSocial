@@ -11,6 +11,7 @@ export interface IProfile {
     education: IEducation[];
     social: ISocial;
     followings : IFollower[];
+    followers : IFollower[];
     date: Date;
 }
 

@@ -1,7 +1,13 @@
 import { HttpException } from "@core/exceptions";
 import { IUser, UserSchema } from "@modules/users";
 import CreateProfileDto from "./dtos/create_profile.dto";
-import { IEducation, IExperience, IProfile, ISocial } from "./profile.interface";
+import {
+  IEducation,
+  IExperience,
+  IFollower,
+  IProfile,
+  ISocial,
+} from "./profile.interface";
 import ProfileSchema from "./profile.model";
 import normalize from "normalize-url";
 import { profile } from "winston";
@@ -69,7 +75,7 @@ class ProfileService {
     }
     profileFields.social = socialFields;
 
-    const profile = await ProfileSchema.findByIdAndUpdate(
+    const profile = await ProfileSchema.findOneAndUpdate(
       { user: userId },
       { $set: profileFields },
       { new: true, upsert: true, setDefaultsOnInsert: true }
@@ -85,74 +91,174 @@ class ProfileService {
     await UserSchema.findOneAndRemove({ _id: userId }).exec();
   }
 
-  public async getAllProfiles() : Promise<Partial<IUser>[]>{
-      const profiles = await ProfileSchema.find()
-        .populate('user', ['name','avatar'])
-        .exec();
+  public async getAllProfiles(): Promise<Partial<IUser>[]> {
+    const profiles = await ProfileSchema.find()
+      .populate("user", ["name", "avatar"])
+      .exec();
     return profiles;
   }
 
-  public addExperience = async (userId: string, experience: AddExperienceDto) => {
+  public addExperience = async (
+    userId: string,
+    experience: AddExperienceDto
+  ) => {
     const newExp = {
-      ...experience
-    }
+      ...experience,
+    };
 
-    const profile = await ProfileSchema.findOne({user: userId}).exec();
-    if(!profile){
-      throw new HttpException(400, 'There is not profile for this user')
+    const profile = await ProfileSchema.findOne({ user: userId }).exec();
+    if (!profile) {
+      throw new HttpException(400, "There is not profile for this user");
     }
 
     profile.experience.unshift(newExp as IExperience);
-    await profile.save()
+    await profile.save();
 
-    return profile
-  }
+    return profile;
+  };
 
-  public deleteExperience = async(userId: string, experienceId: string) => {
-    const profile = await ProfileSchema.findOne({user: userId}).exec();
+  public deleteExperience = async (userId: string, experienceId: string) => {
+    const profile = await ProfileSchema.findOne({ user: userId }).exec();
 
-    if(!profile){
+    if (!profile) {
       throw new HttpException(400, "There is not profile for this user");
     }
 
     profile.experience = profile.experience.filter(
       (exp) => exp._id.toString() !== experienceId
-    )
+    );
 
-    await profile.save()
+    await profile.save();
     return profile;
-  }
+  };
 
   public addEducation = async (userId: string, education: AddEducationDto) => {
     const newEdu = {
-      ...education
-    }
+      ...education,
+    };
 
-    const profile = await ProfileSchema.findOne({user: userId}).exec();
-    if(!profile){
-      throw new HttpException(400, 'There is not profile for this user')
+    const profile = await ProfileSchema.findOne({ user: userId }).exec();
+    if (!profile) {
+      throw new HttpException(400, "There is not profile for this user");
     }
 
     profile.education.unshift(newEdu as IEducation);
-    await profile.save()
+    await profile.save();
 
-    return profile
-  }
+    return profile;
+  };
 
-  public deleteEducation = async(userId: string, educationId: string) => {
-    const profile = await ProfileSchema.findOne({user: userId}).exec();
+  public deleteEducation = async (userId: string, educationId: string) => {
+    const profile = await ProfileSchema.findOne({ user: userId }).exec();
 
-    if(!profile){
+    if (!profile) {
       throw new HttpException(400, "There is not profile for this user");
     }
 
     profile.education = profile.education.filter(
       (exp) => exp._id.toString() !== educationId
+    );
+
+    await profile.save();
+    return profile;
+  };
+
+  public follow = async (fromUserId: string, toUserId: string) => {
+    const fromProfile = await ProfileSchema.findOne({
+      user: fromUserId,
+    }).exec();
+
+    if (!fromProfile) {
+      throw new HttpException(400, "There is not profile for your user");
+    }
+
+    const toProfile = await ProfileSchema.findOne({
+      user: toUserId,
+    }).exec();
+
+    if (!toProfile) {
+      throw new HttpException(400, "There is not profile for target user");
+    }
+
+    if (
+      fromProfile.followings &&
+      fromProfile.followings.some(
+        (follower: IFollower) => follower.user.toString() === toUserId
+      )
+    ) {
+      throw new HttpException(400, "You has been already followed this user");
+    }
+
+    if (
+      toProfile.followers &&
+      toProfile.followers.some(
+        (follower: IFollower) => follower.user.toString() === fromUserId
+      )
+    ) {
+      throw new HttpException(400, "Target user has already been followed by from user");
+    }
+
+    if(!fromProfile.followings) fromProfile.followings = [];
+    fromProfile.followings.unshift({user: toUserId});
+
+    if(!toProfile.followers) toProfile.followers = [];
+    toProfile.followers.unshift({user: fromUserId})
+
+    await fromProfile.save();
+    await toProfile.save();
+
+    return fromProfile;
+  };
+
+  public unFollow = async (fromUserId: string, toUserId: string) => {
+    const fromProfile = await ProfileSchema.findOne({
+      user: fromUserId
+    }).exec()
+
+    if(!fromProfile){
+      throw new HttpException(400, "There is not profile for your user");
+    }
+
+    const toProfile = await ProfileSchema.findOne({
+      user: toUserId,
+    }).exec();
+
+    if (!toProfile) {
+      throw new HttpException(400, "There is not profile for target user");
+    }
+
+    if (
+      fromProfile.followings &&
+      fromProfile.followings.some(
+        (follower: IFollower) => follower.user.toString() === toUserId
+      )
+    ) {
+      throw new HttpException(400, "You has been already followed this user");
+    }
+
+    if (
+      toProfile.followers &&
+      toProfile.followers.some(
+        (follower: IFollower) => follower.user.toString() === fromUserId
+      )
+    ) {
+      throw new HttpException(400, "Target user has already been followed by from user");
+    }
+
+    if(!fromProfile.followings) fromProfile.followings = [];
+    fromProfile.followings = fromProfile.followings.filter(
+      ({user}) => user.toString() !== toUserId
+    )
+    if(!toProfile.followers) toProfile.followers = []
+    toProfile.followers = toProfile.followers.filter(
+      ({user}) => user.toString() !== fromUserId
     )
 
-    await profile.save()
-    return profile;
-  }
+    await fromProfile.save();
+    await toProfile.save();
+
+    return fromProfile;
+  };
 }
 
 export default ProfileService;
