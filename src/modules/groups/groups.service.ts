@@ -69,7 +69,7 @@ export default class GroupService {
       return member.user;
     });
 
-    const users = UserSchema.find({_id: userIds}).select("-password").exec();
+    const users = UserSchema.find({ _id: userIds }).select("-password").exec();
     return users;
   }
 
@@ -202,6 +202,34 @@ export default class GroupService {
     }
 
     group.managers = group.managers.filter(
+      ({ user }) => user.toString() !== userId
+    );
+
+    await group.save();
+    return group;
+  }
+
+  public async removeMember(groupId: string, userId: string): Promise<IGroup> {
+    const group = await GroupSchema.findById(groupId).exec();
+    if (!group) throw new HttpException(400, "Group id is not exists");
+
+    const user = await UserSchema.findById(userId).select("-password").exec();
+    if (!user) throw new HttpException(400, "User is not exists");
+
+    if (
+      group.members &&
+      group.members.findIndex(
+        (item: IMember) => item.user.toString() === userId
+      ) == -1
+    ) {
+      throw new HttpException(400, "You has not yet been member of this group");
+    }
+
+    if (group.members.length == 1) {
+      throw new HttpException(400, "You have last number of this group. Cannot delete");
+    }
+
+    group.members = group.members.filter(
       ({ user }) => user.toString() !== userId
     );
 

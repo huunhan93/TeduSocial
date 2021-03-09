@@ -98,8 +98,8 @@ export default class GroupController {
     next: NextFunction
   ) => {
     try {
-      const userId = req.user.id;
-      const groupId = req.params.id;
+      const userId = req.params.user_id;
+      const groupId = req.params.group_id;
       const result = await this.groupService.approveJoinRequest(userId, groupId);
       res.status(200).json(result);
     } catch (error) {
@@ -128,9 +128,24 @@ export default class GroupController {
     next: NextFunction
   ) => {
     try {
-      const userId = req.user.id;
+      const userId = req.params.user_id;
       const groupId = req.params.group_id;
       const result = await this.groupService.removeManager(groupId, userId);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public removeMember = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const userId = req.params.user_id;
+      const groupId = req.params.group_id;
+      const result = await this.groupService.removeMember(groupId, userId);
       res.status(200).json(result);
     } catch (error) {
       next(error);
