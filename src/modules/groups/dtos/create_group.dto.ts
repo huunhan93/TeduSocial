@@ -1,5 +1,5 @@
 export default class CreateGroupDto{
-    public name: String | undefined;
-    public code: String | undefined;
-    public description: String | undefined;
+    public name: string | undefined;
+    public code: string | undefined;
+    public description: string | undefined;
 }

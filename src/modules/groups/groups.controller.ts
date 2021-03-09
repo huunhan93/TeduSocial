@@ -1,7 +1,6 @@
-import { TokenData } from "@modules/auth";
 import { NextFunction, Request, Response } from "express";
 import CreateGroupDto from "./dtos/create_group.dto";
-import { IGroup } from "./groups.interface";
+
 import GroupService from "./groups.service";
 
 export default class GroupController {
@@ -28,7 +27,7 @@ export default class GroupController {
     next: NextFunction
   ) => {
     try {
-      const posts: IGroup[] = await this.groupService.getAllGroup();
+      const posts = await this.groupService.getAllGroup();
       res.status(200).json(posts);
     } catch (error) {
       next(error);

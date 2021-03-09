@@ -2,7 +2,7 @@
   "name": "tedusocial",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.ts",
   "scripts": {
     "server": "nodemon src/server.ts"
   },
