@@ -12,10 +12,11 @@ export interface IGroup{
 
 export interface IMember{
     user: string;
-    join_date: Date;
+    date: Date;
 }
 
 export interface IManager{
     user: string;
     role: string;
+    date: string;
 }
