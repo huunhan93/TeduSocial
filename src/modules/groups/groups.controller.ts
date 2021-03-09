@@ -92,4 +92,34 @@ export default class GroupController {
       next(error);
     }
   };
+
+  public addManager = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const request = req.body;
+      const groupId = req.params.group_id;
+      const result = await this.groupService.addManager(groupId, request);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public removeManager = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const userId = req.user.id;
+      const groupId = req.params.group_id;
+      const result = await this.groupService.removeManager(groupId, userId);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
