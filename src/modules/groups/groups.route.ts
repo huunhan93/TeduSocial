@@ -23,6 +23,7 @@ export default class GroupRoute implements Route {
     );
 
     this.router.get(this.path, this.groupController.getAllGroups);
+    this.router.get(this.path + "/members/:id", this.groupController.getAllMembers);
     this.router.put(
       this.path + "/:id",
       authMiddleware,
