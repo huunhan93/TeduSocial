@@ -40,7 +40,7 @@ const ConversationSchema = new mongoose.Schema({
       show_on_to: { type: Boolean, default: true },
       date: {
         type: Date,
-        default: false,
+        default: Date.now,
       },
     },
   ],

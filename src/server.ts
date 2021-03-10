@@ -7,6 +7,7 @@ import { validateEnv } from "@core/utils";
 import ProfileRoute from "@modules/profile/profile.route";
 import PostsRoute from "@modules/posts/posts.route";
 import GroupRoute from "@modules/groups/groups.route";
+import ConversationRoute from "@modules/conversations/conversations.route";
 
 validateEnv();
 const routes = [
@@ -15,7 +16,8 @@ const routes = [
   new AuthRoute(),
   new ProfileRoute(),
   new PostsRoute(),
-  new GroupRoute()
+  new GroupRoute(),
+  new ConversationRoute(),
 ];
 
 const app = new App(routes);
