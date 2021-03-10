@@ -2,10 +2,10 @@ import { IsNotEmpty } from "class-validator";
 
 export default class CreateCommentDto{
     @IsNotEmpty()
-    public text: String | undefined;
+    public text: string | undefined;
     @IsNotEmpty()
-    public userId: String | undefined;
+    public userId: string | undefined;
     @IsNotEmpty()
-    public postId: String | undefined;
+    public postId: string | undefined;
 
 }

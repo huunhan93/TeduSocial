@@ -53,3 +53,10 @@
 - yarn add -D @types/swagger-ui-express
 - yarn add -D @types/yamljs
 
+# Eslint 
+- yarn add eslint --dev
+- yarn add @shopify/eslint-plugin @typescript-eslint/eslint-plugin @typescript-eslint/parser --dev
+
+# Format code
+- yarn add prettier --dev
+- yarn add husky --dev

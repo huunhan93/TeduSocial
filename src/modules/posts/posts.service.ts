@@ -57,7 +57,7 @@ export default class PostService {
     keyword: string,
     page: number
   ): Promise<IPagination<IPost>> {
-    const pageSize: number = Number(process.env.PAGE_SIZE || 10);
+    const pageSize = Number(process.env.PAGE_SIZE || 10);
     let query = {};
     if (keyword) {
       query = {
