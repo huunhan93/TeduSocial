@@ -56,17 +56,29 @@ export default class ConversationService {
         (conversation.user1 !== userId && conversation.user2 !== dto.to) ||
         (conversation.user1 !== dto.to && conversation.user2 !== userId)
       ) {
-          throw new HttpException(400, "Conversation id is not valid")
+        throw new HttpException(400, "Conversation id is not valid");
       }
 
       conversation.messages.unshift({
-          to: dto.to,
-          text: dto.text,
-          from: userId
+        to: dto.to,
+        text: dto.text,
+        from: userId,
       } as IMessage);
 
       await conversation.save();
       return conversation;
     }
+  }
+
+  public async getMyConversation(userId: string): Promise<IConversation[]> {
+    const user = await UserSchema.findById(userId).select("-password").exec();
+    if (!user) throw new HttpException(400, "User id is not exist");
+
+    const conversations = await ConversationSchema.find({
+      $or: [{ user1: userId }, { user2: userId }],
+    })
+      .sort({ recent_date: -1 })
+      .exec();
+    return conversations;
   }
 }

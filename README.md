@@ -46,4 +46,10 @@
 - yarn add bcryptjs -- ma hoa va giai ma trong nodejs
 - yarn add jsonwebtoken
 
-# Json
+# Swagger
+- yarn add swagger-ui-express
+- yarn add yamljs
+
+- yarn add -D @types/swagger-ui-express
+- yarn add -D @types/yamljs
+
