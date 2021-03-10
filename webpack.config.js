@@ -29,10 +29,5 @@ module.exports = {
         use: ['ts-loader'],
       },
     ],
-  },
-  plugins: [
-    new WebpackShellPlugin({
-      onBuildEnd: ['yarn run:dev'],
-    }),
-  ],
+  }
 };
