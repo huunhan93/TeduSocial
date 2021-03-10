@@ -60,3 +60,12 @@
 # Format code
 - yarn add prettier --dev
 - yarn add husky --dev
+
+# webpack
+- yarn add -D webpack webpack-cli
+- yarn add -D webpack-node-externals webpack-shell-plugin
+- yarn add -D tsconfig-paths-webpack-plugin
+- yarn add ts-loader --dev
+- using:
+- + yarn build 
+- + yarn run:dev
