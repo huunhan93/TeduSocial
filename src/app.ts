@@ -9,6 +9,8 @@ import morgan from "morgan";
 import cors from "cors";
 import helmet from "helmet";
 import { errorMiddleware } from "@core/middleware";
+import YAML from "yamljs";
+import swaggerUi from "swagger-ui-express";
 
 class App {
   public app: express.Application;
@@ -24,6 +26,7 @@ class App {
     this.initializeMiddleware();
     this.initializeRoutes(routes);
     this.initializeErrorMiddleware();
+    this.initializeSwagger();
   }
   public listen() {
     this.app.listen(this.port, () => {
@@ -52,12 +55,12 @@ class App {
     this.app.use(express.urlencoded({ extended: true }));
   }
 
-  private initializeErrorMiddleware(){
+  private initializeErrorMiddleware() {
     this.app.use(errorMiddleware);
   }
 
   private connectToDatabase() {
-    var connectionString = process.env.MONGODB_URI;
+    const connectionString = process.env.MONGODB_URI;
     if (!connectionString) {
       Logger.error("Connection string is invalid");
       return;
@@ -74,6 +77,11 @@ class App {
         Logger.error("" + reason);
       });
     Logger.info("Database connected...");
+  }
+
+  private initializeSwagger() {
+    const swaggerDocument = YAML.load("./src/swagger.yaml");
+    this.app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
 }
 

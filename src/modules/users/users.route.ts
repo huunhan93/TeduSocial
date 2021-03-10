@@ -5,7 +5,7 @@ import RegisterDto from "./dtos/register.dto";
 import UsersController from "./users.controller";
 
 export default class UsersRoute implements Route {
-  public path = "/api/users";
+  public path = "/api/v1/users";
   public router = Router();
   public usersController = new UsersController();
 
@@ -22,6 +22,7 @@ export default class UsersRoute implements Route {
 
     this.router.put(
       this.path + "/:id",
+      authMiddleware,
       validationMiddleware(RegisterDto, true),
       this.usersController.updateUser
     );

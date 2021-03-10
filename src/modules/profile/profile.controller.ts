@@ -1,5 +1,6 @@
 import { IUser } from "@modules/users";
 import { Request, Response, NextFunction } from "express";
+import AddEducationDto from "./dtos/add_education.dto";
 import AddExperienceDto from "./dtos/add_experience.dto";
 import CreateProfileDto from "./dtos/create_profile.dto";
 import { IProfile } from "./profile.interface";
@@ -114,6 +115,128 @@ class ProfileController {
       res.status(200).json(profile);
     } catch (error) {
       next(error);
+    }
+  };
+
+  public createEducation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const data: AddEducationDto = req.body;
+    const userId = req.user.id;
+    try {
+      const createUserData: IProfile = await this.profileService.addEducation(
+        userId,
+        data
+      );
+      res.status(200).json(createUserData);
+    } catch (error) {
+      next()
+    }
+  };
+
+  public deleteEducation = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const eduId = req.params.edu_id;
+      const profile = await this.profileService.deleteEducation(req.user.id, eduId);
+      res.status(200).json(profile);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  public follow = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const toUserId: string = req.params.id;
+    
+    try {
+      const profile: IProfile = await this.profileService.follow(
+        req.user.id,
+        toUserId
+      );
+      res.status(200).json(profile);
+    } catch (error) {
+      next()
+    }
+  };
+
+  public unFollow = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const toUserId: string = req.params.id;
+    
+    try {
+      const profile: IProfile = await this.profileService.unFollow(
+        req.user.id,
+        toUserId
+      );
+      res.status(200).json(profile);
+    } catch (error) {
+      next()
+    }
+  };
+
+  public addFriend = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const toUserId: string = req.params.id;
+    
+    try {
+      const profile: IProfile = await this.profileService.addFriend(
+        req.user.id,
+        toUserId
+      );
+      res.status(200).json(profile);
+    } catch (error) {
+      next()
+    }
+  };
+
+  public unFriend = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const toUserId: string = req.params.id;
+    
+    try {
+      const profile: IProfile = await this.profileService.unFriend(
+        req.user.id,
+        toUserId
+      );
+      res.status(200).json(profile);
+    } catch (error) {
+      next()
+    }
+  };
+
+  public acceptFriendRequest = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const toUserId: string = req.params.id;
+    
+    try {
+      const profile: IProfile = await this.profileService.acceptFriendRequest(
+        req.user.id,
+        toUserId
+      );
+      res.status(200).json(profile);
+    } catch (error) {
+      next()
     }
   };
 }

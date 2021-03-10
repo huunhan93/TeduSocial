@@ -46,4 +46,26 @@
 - yarn add bcryptjs -- ma hoa va giai ma trong nodejs
 - yarn add jsonwebtoken
 
-# Json
+# Swagger
+- yarn add swagger-ui-express
+- yarn add yamljs
+
+- yarn add -D @types/swagger-ui-express
+- yarn add -D @types/yamljs
+
+# Eslint 
+- yarn add eslint --dev
+- yarn add @shopify/eslint-plugin @typescript-eslint/eslint-plugin @typescript-eslint/parser --dev
+
+# Format code
+- yarn add prettier --dev
+- yarn add husky --dev
+
+# webpack
+- yarn add -D webpack webpack-cli
+- yarn add -D webpack-node-externals webpack-shell-plugin
+- yarn add -D tsconfig-paths-webpack-plugin
+- yarn add ts-loader --dev
+- using:
+- + yarn build 
+- + yarn run:dev
