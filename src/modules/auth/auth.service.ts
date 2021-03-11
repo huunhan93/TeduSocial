@@ -1,10 +1,11 @@
-import { DataStoredInToken, IUser, TokenData } from '@modules/auth';
+import { IUser, TokenData } from '@modules/auth';
 import { UserSchema } from '@modules/users';
 import LoginDto from './auth.dto';
-import jwt from 'jsonwebtoken';
-import { isEmptyObject } from '@core/utils';
+import { isEmptyObject, Logger } from '@core/utils';
 import { HttpException } from '@core/exceptions';
 import bcryptjs from 'bcryptjs';
+import { generateJwtToken, randomTokenString } from '@core/utils/helper';
+import { RefreshTokenSchema } from '@modules/refresh_token';
 
 class AuthService {
   public userSchema = UserSchema;
@@ -20,16 +21,13 @@ class AuthService {
     const isMatchPassword = await bcryptjs.compare(model.password, user.password);
     if (!isMatchPassword) throw new HttpException(400, 'Credential is not valid');
 
-    return this.createToken(user);
-  }
+    const refreshToken = await this.generateRefreshToken(user._id);
+    const jwtToken = generateJwtToken(user._id, refreshToken.token);
 
-  private createToken(user: IUser): TokenData {
-    const dataInToken: DataStoredInToken = { id: user._id };
-    const secret: string = process.env.JWT_TOKEN_SECRET!;
-    const expiresIn = 6000;
-    return {
-      token: jwt.sign(dataInToken, secret, { expiresIn: expiresIn }),
-    };
+    //save refresh token
+    await refreshToken.save();
+
+    return jwtToken;
   }
 
   public async getCurrentLoginUser(userId: string): Promise<IUser> {
@@ -39,6 +37,44 @@ class AuthService {
     }
 
     return user;
+  }
+
+  public async refreshToken(token: string): Promise<TokenData>{
+    const refreshToken = await this.getRefreshTokenFromDb(token);
+    const {user} = refreshToken;
+
+    // replace old refresh token with a new one and save
+    const newRefreshToken = await this.generateRefreshToken(user);
+    refreshToken.revoked = new Date(Date.now());
+    refreshToken.replacedByToken = newRefreshToken.token;
+    await refreshToken.save();
+    await newRefreshToken.save();
+
+    // return basic details and tokens
+    return generateJwtToken(user, newRefreshToken.token);
+  }
+
+  public async revokeToken(token: string): Promise<void>{
+    const refreshToken = await this.getRefreshTokenFromDb(token);
+
+    //revoke token and save
+    refreshToken.revoked = new Date(Date.now());
+    await refreshToken.save();
+  }
+
+  public async getRefreshTokenFromDb(refreshToken: string){
+    const token = await RefreshTokenSchema.findOne({token: refreshToken}).populate("user").exec();
+    Logger.info(token);
+    if(!token || !token.isActive) throw new HttpException(400, "Invalid refresh token");
+    return token;
+  }
+
+  public async generateRefreshToken(userId: string){
+    return new RefreshTokenSchema({
+      user: userId,
+      token: randomTokenString(),
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // in 7 days
+    })
   }
 }
 

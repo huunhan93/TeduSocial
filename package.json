@@ -57,6 +57,7 @@
     "class-transformer": "^0.3.2",
     "class-validator": "^0.13.1",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "envalid": "^6.0.2",
     "express": "^4.17.1",

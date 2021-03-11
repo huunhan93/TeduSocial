@@ -1,4 +1,4 @@
-import { DataStoredInToken, TokenData } from "@modules/auth";
+
 import UserSchema from "./users.model";
 import RegisterDto from "./dtos/register.dto";
 import { isEmptyObject } from "@core/utils";
@@ -6,8 +6,10 @@ import { HttpException } from "@core/exceptions";
 import gravatar from "gravatar";
 import bcryptjs from "bcryptjs";
 import IUser from "./users.interface";
-import jwt from "jsonwebtoken";
 import { IPagination } from "@core/interfaces";
+import { TokenData } from '@modules/auth';
+import { RefreshTokenSchema } from '@modules/refresh_token';
+import { generateJwtToken, randomTokenString } from "@core/utils/helper";
 
 
 class UserService {
@@ -37,17 +39,10 @@ class UserService {
       avatar: avatar,
       date: Date.now(),
     });
+    const refreshToken = await this.generateRefreshToken(createdUser._id);
+    await refreshToken.save()
 
-    return this.createToken(createdUser);
-  }
-
-  private createToken(user: IUser): TokenData {
-    const dataInToken: DataStoredInToken = { id: user._id };
-    const secret: string = process.env.JWT_TOKEN_SECRET!;
-    const expiresIn = 3600;
-    return {
-      token: jwt.sign(dataInToken, secret, { expiresIn: expiresIn }),
-    };
+    return generateJwtToken(createdUser._id, refreshToken.token);
   }
 
   public async updateUser(userId: string, model: RegisterDto): Promise<IUser> {
@@ -151,6 +146,15 @@ class UserService {
     const deleteUser = await this.userSchema.findByIdAndDelete(userId).exec();
     if(!deleteUser) throw new HttpException(409, "Your id is invalid")
     return deleteUser;
+  }
+
+  private async generateRefreshToken(userId: string) {
+    // create a refresh token that expires in 7 days
+    return new RefreshTokenSchema({
+      user: userId,
+      token: randomTokenString(),
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
   }
 }
 

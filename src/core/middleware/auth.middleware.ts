@@ -1,8 +1,7 @@
-
-import { DataStoredInToken } from "@modules/auth/auth.interface";
+import { DataStoredInToken } from "@core/interfaces";
+import { Logger } from "@core/utils";
 import { NextFunction, Response, Request } from "express";
 import jwt from 'jsonwebtoken'
-
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const token = req.header('x-auth-token');
@@ -11,14 +10,19 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
         return res.status(401).json({message: "No token, authorization denied"});
     }
     try{
-        const user = jwt.verify(token, process.env.JWT_TOKEN_SECRET!) as DataStoredInToken
+        const user = jwt.verify(token, process.env.JWT_TOKEN_SECRET ?? '') as DataStoredInToken
         
         if(!req.user) req.user = {id: ""};
 
         req.user.id = user.id;
         next()
     }catch(error){
-        return res.status(401).json({message: "Token is not valid"});
+        Logger.error(`[ERROR] Msg: ${token}`);
+        if(error.name == 'TokenExpiredError'){
+            res.status(401).json({message: 'Token is expired'});
+        }else{
+            res.status(401).json({message: "Token is not valid"});
+        }
     }
 }
 
