@@ -114,7 +114,7 @@ class UserService {
 
   public async getAllPaging(keyword: string, page: number): Promise<IPagination<IUser>> {
     const pageSize = Number(process.env.PAGE_SIZE || 10);
-    let query ;
+    let query = {};
     if(keyword){
       query = this.userSchema
         .find({
@@ -125,15 +125,15 @@ class UserService {
           ]
         })
         .sort({date: -1});
-    }else{
-      query = this.userSchema.find().sort({date: -1});
     }
-    const users = await query
+
+    const users = await this.userSchema
+      .find(query)
       .skip((page -1) * pageSize)
       .limit(pageSize)
       .exec();
 
-    const rowCount = await query.countDocuments().exec();
+    const rowCount = await this.userSchema.find(query).countDocuments().exec();
     return {
       total : rowCount,
       page : page,
